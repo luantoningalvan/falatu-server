@@ -1,8 +1,24 @@
 import 'reflect-metadata';
 import { createExpressServer } from 'routing-controllers';
 import { bootstrapDependencies } from './container';
+import { resolve } from 'path';
+import { config } from 'dotenv';
+import { connect } from 'mongoose';
 
-(() => {
+(async () => {
+  // Set up environment variables
+  config({ path: resolve(__dirname, '..', '.env') });
+  const { DB_URL } = process.env;
+
+  // Connect to database
+  await connect(DB_URL, {
+    useFindAndModify: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
+
+  // Setup DI containers
   bootstrapDependencies();
   createExpressServer({
     routePrefix: '/api/v1',
