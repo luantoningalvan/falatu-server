@@ -20,6 +20,9 @@ export class User {
   password: string;
 
   @Property({ required: true })
+  username: string;
+
+  @Property()
   name: string;
 
   // Method for verifying password on authentication

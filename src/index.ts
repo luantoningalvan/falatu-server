@@ -1,6 +1,8 @@
 import 'reflect-metadata';
 import { createExpressServer } from 'routing-controllers';
 import { bootstrapDependencies } from './container';
+import { AuthChecker } from './auth/AuthChecker';
+import { CurrentUserChecker } from './auth/CurrentUserChecker';
 import { resolve } from 'path';
 import { config } from 'dotenv';
 import { connect } from 'mongoose';
@@ -20,7 +22,10 @@ import { connect } from 'mongoose';
 
   // Setup DI containers
   bootstrapDependencies();
+  // Create Express server instance
   createExpressServer({
+    authorizationChecker: AuthChecker,
+    currentUserChecker: CurrentUserChecker,
     routePrefix: '/api/v1',
     cors: true,
     controllers: [__dirname + '/controllers/*.controller.ts'],
