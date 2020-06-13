@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "outDir": "build",
+    "module": "CommonJS",
+    "target": "ES2018",
+    "lib": ["ES2018", "ESNext.AsyncIterable"],
+    "sourceMap": true,
+    "allowJs": true,
+    "declaration": false,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+  },
+  "exclude": ["node_modules", "build", ".prettierrc.js", ".eslintrc.js", "commitlint.config.js"]
+}
