@@ -10,7 +10,9 @@ import { connect } from 'mongoose';
 (async () => {
   // Set up environment variables
   config({ path: resolve(__dirname, '..', '.env') });
-  const { DB_URL } = process.env;
+  const { DB_URL, NODE_ENV, PORT } = process.env;
+
+  const IS_PROD = NODE_ENV === 'production';
 
   // Connect to database
   await connect(DB_URL, {
@@ -28,13 +30,19 @@ import { connect } from 'mongoose';
     currentUserChecker: CurrentUserChecker,
     routePrefix: '/api/v1',
     cors: true,
-    controllers: [__dirname + '/controllers/*.controller.ts'],
-    middlewares: [__dirname + '/middlewares/*.middleware.ts'],
-    interceptors: [__dirname + '/interceptors/*.interceptor.ts'],
-  }).listen(3333, () => {
+    controllers: [
+      __dirname + `/controllers/*.controller.${IS_PROD ? 'j' : 't'}s`,
+    ],
+    middlewares: [
+      __dirname + `/middlewarts/*.middleware.${IS_PROD ? 'j' : 't'}s`,
+    ],
+    interceptors: [
+      __dirname + `/interceptors/*.interceptors.${IS_PROD ? 'j' : 't'}s`,
+    ],
+  }).listen(parseInt(PORT), () => {
     console.log(
       [
-        'WDYT Server rodando na porta 3333',
+        `WDYT Server rodando na porta ${PORT}`,
         'Versão 1.0.0 por Vini Franco e Luan Tonin Galvan',
       ].join('\n')
     );

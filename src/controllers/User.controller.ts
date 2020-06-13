@@ -52,6 +52,6 @@ export class UserController {
   @Post('/signup')
   public async signUp(@Body() body: SignUpInput, @Res() res: Response) {
     const user = await this.repo.store(body);
-    return res.json(user);
+    return res.json({ username: user.username, email: user.email });
   }
 }
