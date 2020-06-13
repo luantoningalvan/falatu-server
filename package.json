@@ -11,7 +11,7 @@
     "prebuild": "rm -rf build/*",
     "compile": "yarn prebuild && yarn build",
     "dev": "ts-node-dev ./src/index.ts",
-    "start": "NODE_ENV=production node ./build/server.js"
+    "start": "NODE_ENV=production node ./build/index.js"
   },
   "devDependencies": {
     "@commitlint/cli": "^8.3.5",
