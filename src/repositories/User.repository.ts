@@ -28,4 +28,8 @@ export class UserRepository {
   public async findOne(query: UserQuery) {
     return await this.model.findOne(query);
   }
+
+  public async findWithPassword(query: UserQuery) {
+    return await this.model.findOne(query).select('+password');
+  }
 }

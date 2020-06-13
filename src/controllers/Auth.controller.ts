@@ -21,7 +21,7 @@ export class AuthController {
   public async login(@Res() res: Response, @Body() body: LoginInput) {
     // Extract email and password from body
     const { email, password } = body;
-
-    return res.json(this.service.checkLogin(email, password));
+    const check = await this.service.checkLogin(email, password);
+    return res.json(check);
   }
 }
