@@ -41,7 +41,7 @@ export class QuestionController {
     private readonly service: QuestionService
   ) {}
 
-  @Post('/new')
+  @Post()
   public async newQuestion(
     @CurrentUser({ required: true }) user: DocumentType<User>,
     @Body() body: QuestionInput,
