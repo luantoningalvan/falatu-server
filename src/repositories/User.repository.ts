@@ -36,4 +36,8 @@ export class UserRepository {
   public async findWithPassword(query: UserQuery) {
     return await this.model.findOne(query).select('+password');
   }
+
+  public async findAndUpdate(id: string, query: UserQuery) {
+    return await this.model.findByIdAndUpdate(id, query);
+  }
 }

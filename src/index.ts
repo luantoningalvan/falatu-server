@@ -16,7 +16,7 @@ import { connect } from 'mongoose';
 
   // Connect to database
   await connect(DB_URL, {
-    useFindAndModify: true,
+    useFindAndModify: false,
     useCreateIndex: true,
     useUnifiedTopology: true,
     useNewUrlParser: true,

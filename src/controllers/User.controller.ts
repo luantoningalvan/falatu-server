@@ -6,6 +6,7 @@ import {
   Res,
   Body,
   CurrentUser,
+  Patch,
 } from 'routing-controllers';
 import { Request, Response } from 'express';
 import { IsEmail, IsString, IsOptional } from 'class-validator';
@@ -31,6 +32,19 @@ class SignUpInput {
   password: string;
 }
 
+class EditProfileInput {
+  @IsOptional()
+  @IsEmail()
+  email: string;
+
+  @IsOptional()
+  @IsString()
+  username: string;
+
+  @IsOptional()
+  @IsString()
+  name?: string;
+}
 @JsonController('/users')
 export class UserController {
   // Inject dependencies on construct
@@ -57,5 +71,15 @@ export class UserController {
       return res.json({ username: user.username, email: user.email });
     }
     return res.json({ error: 'User already exists' });
+  }
+
+  @Patch('/me')
+  public async editMyProfile(
+    @Body() body: EditProfileInput,
+    @Res() res: Response,
+    @CurrentUser({ required: true }) user: DocumentType<User>
+  ) {
+    const doc = await this.repo.findAndUpdate(user._id, body);
+    return res.json(doc);
   }
 }

@@ -25,6 +25,9 @@ export class User {
   @Property()
   name: string;
 
+  @Property({ default: ['user'], enum: ['user', 'admin'] })
+  roles: string[];
+
   // Method for verifying password on authentication
   public async verifyPassword(password: string) {
     return await argon2.verify(this.password, password);
