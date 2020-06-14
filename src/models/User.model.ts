@@ -25,8 +25,11 @@ export class User {
   @Property()
   name: string;
 
-  @Property({ default: ['user'], enum: ['user', 'admin'] })
+  @Property({ default: 'user', enum: ['user', 'admin'], select: false })
   roles: string[];
+
+  @Property({ default: 0 })
+  answerCount: number;
 
   // Method for verifying password on authentication
   public async verifyPassword(password: string) {

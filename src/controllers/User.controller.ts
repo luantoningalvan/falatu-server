@@ -7,6 +7,8 @@ import {
   Body,
   CurrentUser,
   Patch,
+  Param,
+  Authorized,
 } from 'routing-controllers';
 import { Request, Response } from 'express';
 import { IsEmail, IsString, IsOptional } from 'class-validator';
@@ -62,6 +64,13 @@ export class UserController {
     @Res() res: Response
   ) {
     return res.json(me);
+  }
+
+  @Authorized()
+  @Get('/:id')
+  public async getUser(@Param('id') id: string, @Res() res: Response) {
+    const doc = await this.repo.findById(id);
+    return res.json(doc);
   }
 
   @Post('/signup')

@@ -1,6 +1,7 @@
 import { Service } from 'typedi';
 import { Question, QuestionModel } from '../models/Question.model';
 import { mongoose } from '@typegoose/typegoose';
+import { MongooseFilterQuery } from 'mongoose';
 
 type QuestionQuery = Omit<Partial<Question>, 'createdAt'>;
 
@@ -36,7 +37,7 @@ export class QuestionRepository {
     return await this.model.find(query).limit(limit).skip(magicNumber);
   }
 
-  public async findMany(query: QuestionQuery) {
+  public async findMany(query: MongooseFilterQuery<QuestionQuery>) {
     return await this.model.find(query);
   }
 

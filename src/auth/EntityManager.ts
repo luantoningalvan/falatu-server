@@ -15,7 +15,7 @@ export function getEntityManager<TClassType = any>(
       const ent = getModelForClass(this.entity);
       const decodedToken = verify(token, process.env.JWT_SECRET);
       // Check for existing user with the id present in the token
-      const doc = await ent.findById((decodedToken as any).id);
+      const doc = await ent.findById((decodedToken as any).id).select('+roles');
       return doc;
     }
 

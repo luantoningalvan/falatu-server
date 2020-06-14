@@ -28,13 +28,14 @@ import { connect } from 'mongoose';
   createExpressServer({
     authorizationChecker: AuthChecker,
     currentUserChecker: CurrentUserChecker,
+    defaultErrorHandler: false,
     routePrefix: '/api/v1',
     cors: true,
     controllers: [
       __dirname + `/controllers/*.controller.${IS_PROD ? 'j' : 't'}s`,
     ],
     middlewares: [
-      __dirname + `/middlewarts/*.middleware.${IS_PROD ? 'j' : 't'}s`,
+      __dirname + `/middlewares/*.middleware.${IS_PROD ? 'j' : 't'}s`,
     ],
     interceptors: [
       __dirname + `/interceptors/*.interceptors.${IS_PROD ? 'j' : 't'}s`,

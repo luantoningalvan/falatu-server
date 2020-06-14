@@ -97,7 +97,17 @@ export class QuestionController {
   }
 
   @Authorized()
-  @Get('/many/:number/')
+  @Get('/user/:id')
+  public async getQuestionsByUser(
+    @Param('id') id: string,
+    @Res() res: Response
+  ) {
+    const docs = await this.repo.findMany({ user: id });
+    return res.json(docs);
+  }
+
+  @Authorized()
+  @Get('/random/:number/')
   public async getManyQuestions(
     @Param('number') num: number,
     @CurrentUser() user: DocumentType<User>,
@@ -130,18 +140,26 @@ export class QuestionController {
     switch (body.type) {
       case QuestionTypes.MULTI: {
         const doc = await this.service.answerMulti(id, body.optionIndex);
+        user.answerCount++;
+        await user.save();
         return res.json(doc);
       }
       case QuestionTypes.YESORNOT: {
         const doc = await this.service.answerMulti(id, body.optionIndex);
+        user.answerCount++;
+        await user.save();
         return res.json(doc);
       }
       case QuestionTypes.PHOTO_COMPARISON: {
         const doc = await this.service.answerMulti(id, body.optionIndex);
+        user.answerCount++;
+        await user.save();
         return res.json(doc);
       }
       case QuestionTypes.WRITTEN: {
         const doc = await this.service.answerWritten(id, body.answer, user._id);
+        user.answerCount++;
+        await user.save();
         return res.json(doc);
       }
       default:

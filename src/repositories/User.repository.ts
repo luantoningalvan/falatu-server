@@ -1,6 +1,5 @@
 import { Service } from 'typedi';
 import { User, UserModel } from '../models/User.model';
-import { ObjectId } from 'mongodb';
 
 type UserQuery = Omit<Partial<User>, 'verifyPassword'>;
 
@@ -25,7 +24,7 @@ export class UserRepository {
     return await this.model.find({});
   }
 
-  public async findById(id: ObjectId) {
+  public async findById(id: string) {
     return await this.model.findById(id);
   }
 
