@@ -1,6 +1,7 @@
 import { Service, Container } from 'typedi';
 import { UserRepository } from '../repositories/User.repository';
 import { sign } from 'jsonwebtoken';
+import { UnauthorizedError } from 'routing-controllers';
 
 @Service()
 export class AuthService {
@@ -23,6 +24,6 @@ export class AuthService {
         return { user: user.username, token };
       }
     }
-    return { error: 'Invalid credentials provided.' };
+    throw new UnauthorizedError('Invalid credentials provided.');
   }
 }
