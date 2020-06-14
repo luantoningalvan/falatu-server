@@ -14,7 +14,11 @@ export class UserRepository {
   }
 
   public async store(data: UserQuery) {
-    return await this.model.create(data);
+    // First check if user does not exist
+    const check = await this.model.findOne({ username: data.username });
+    if (!check) {
+      return await this.model.create(data);
+    }
   }
 
   public async findAll() {

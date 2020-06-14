@@ -8,7 +8,7 @@ import {
   CurrentUser,
 } from 'routing-controllers';
 import { Request, Response } from 'express';
-import { IsEmail, IsString } from 'class-validator';
+import { IsEmail, IsString, IsOptional } from 'class-validator';
 
 // Dep types
 import { UserRepository } from '../repositories/User.repository';
@@ -23,6 +23,7 @@ class SignUpInput {
   @IsString()
   username: string;
 
+  @IsOptional()
   @IsString()
   name?: string;
 
@@ -52,6 +53,9 @@ export class UserController {
   @Post('/signup')
   public async signUp(@Body() body: SignUpInput, @Res() res: Response) {
     const user = await this.repo.store(body);
-    return res.json({ username: user.username, email: user.email });
+    if (user) {
+      return res.json({ username: user.username, email: user.email });
+    }
+    return res.json({ error: 'User already exists' });
   }
 }

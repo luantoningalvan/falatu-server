@@ -18,6 +18,12 @@ export function getEntityManager<TClassType = any>(
       const doc = await ent.findById((decodedToken as any).id);
       return doc;
     }
+
+    public async findOneByUsername(username: string) {
+      const ent = getModelForClass(this.entity);
+      const doc = await (ent.findOne as any)({ username });
+      return doc;
+    }
   }
 
   return new EntityManager(Entity);
