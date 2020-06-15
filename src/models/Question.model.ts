@@ -12,8 +12,14 @@ export class Option {
   @Property({ default: 0, type: Number })
   answerCount: number;
 
-  @Property({ required: true, type: String })
+  @Property()
   title: string;
+
+  @Property()
+  url: string;
+
+  @Property()
+  key: string;
 }
 
 export class WrittenAnswer {

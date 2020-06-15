@@ -5,6 +5,17 @@ import {
 } from '@typegoose/typegoose';
 import argon2 from 'argon2';
 
+class AvatarObject {
+  @Property()
+  url: string;
+
+  @Property()
+  key: string;
+
+  @Property()
+  index: number;
+}
+
 @PreHook<User>('save', async function () {
   if (this.isModified('password')) {
     this.password = await argon2.hash(this.password, {
@@ -30,6 +41,9 @@ export class User {
 
   @Property({ default: 0 })
   answerCount: number;
+
+  @Property({ type: Array, default: [] })
+  avatarList: AvatarObject[];
 
   // Method for verifying password on authentication
   public async verifyPassword(password: string) {

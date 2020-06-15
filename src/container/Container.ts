@@ -12,6 +12,7 @@ import { ReportRepository } from '../repositories/Report.repository';
 import { AuthService } from '../services/Auth.service';
 import { QuestionService } from '../services/Question.service';
 import { ReportService } from '../services/Report.service';
+import { StorageService } from '../services/Storage.service';
 
 export function bootstrapDependencies(): void {
   // Set repositories
@@ -23,6 +24,7 @@ export function bootstrapDependencies(): void {
   Container.set(AuthService, new AuthService());
   Container.set(QuestionService, new QuestionService());
   Container.set(ReportService, new ReportService());
+  Container.set(StorageService, new StorageService());
 
   RCUseContainer(Container);
   CVUseContainer(Container);

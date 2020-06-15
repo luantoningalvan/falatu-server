@@ -1,11 +1,12 @@
 import 'reflect-metadata';
-import { createExpressServer } from 'routing-controllers';
-import { bootstrapDependencies } from './container';
-import { AuthChecker } from './auth/AuthChecker';
-import { CurrentUserChecker } from './auth/CurrentUserChecker';
+import { useExpressServer } from 'routing-controllers';
+import express from 'express';
 import { resolve } from 'path';
 import { config } from 'dotenv';
 import { connect } from 'mongoose';
+import { bootstrapDependencies } from './container';
+import { AuthChecker } from './auth/AuthChecker';
+import { CurrentUserChecker } from './auth/CurrentUserChecker';
 
 (async () => {
   // Set up environment variables
@@ -25,7 +26,9 @@ import { connect } from 'mongoose';
   // Setup DI containers
   bootstrapDependencies();
   // Create Express server instance
-  createExpressServer({
+  const app = express();
+
+  useExpressServer(app, {
     authorizationChecker: AuthChecker,
     currentUserChecker: CurrentUserChecker,
     defaultErrorHandler: false,
@@ -40,7 +43,10 @@ import { connect } from 'mongoose';
     interceptors: [
       __dirname + `/interceptors/*.interceptors.${IS_PROD ? 'j' : 't'}s`,
     ],
-  }).listen(parseInt(PORT), () => {
+  });
+
+  // Listen on designated port
+  app.listen(parseInt(PORT), () => {
     console.log(
       [
         `WDYT Server rodando na porta ${PORT}`,
