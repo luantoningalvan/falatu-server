@@ -44,7 +44,6 @@ export const uploadSingle = multer({
   },
   fileFilter: (req, file, cb) => {
     const mimes = ['image/jpeg', 'image/png'];
-    console.log(file.mimetype);
     if (mimes.includes(file.mimetype)) {
       return cb(null, true);
     }

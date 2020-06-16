@@ -24,9 +24,10 @@ export class QuestionService {
     return doc;
   }
 
-  public async answerMulti(id: string, optionIndex: number) {
+  public async answerMulti(id: string, optionIndex: number, who: string) {
     const doc = await this.repo.findById(id);
     doc.options[optionIndex].answerCount++;
+    doc.answers.push({ index: optionIndex, answeredBy: new ObjectId(who) });
     await doc.save();
     return doc;
   }

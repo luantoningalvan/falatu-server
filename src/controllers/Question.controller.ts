@@ -72,12 +72,29 @@ export class QuestionController {
     @CurrentUser() user: DocumentType<User>,
     @Res() res: Response
   ) {
-    const docs = (await this.repo.findManyAtRandom({}, num)).filter(
-      (document) =>
-        (document.user as ObjectId).toHexString() !==
-        (user._id as ObjectId).toHexString()
-    );
-    return res.json(docs);
+    try {
+      const docs = (await this.repo.findManyAtRandom({}, num)).filter(
+        (document) =>
+          ((document.user as DocumentType<User>)
+            ._id as ObjectId).toHexString() !==
+          (user._id as ObjectId).toHexString()
+      );
+
+      docs.forEach((doc) => {
+        if ((doc.user as DocumentType<User>).avatarList.length > 0) {
+          doc.randomUserAvatar = (doc.user as DocumentType<User>).avatarList[
+            Math.floor(
+              Math.random() * (doc.user as DocumentType<User>).avatarList.length
+            )
+          ].url;
+        }
+        return doc;
+      });
+
+      return res.json(docs);
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   @Post()
@@ -115,19 +132,31 @@ export class QuestionController {
   ) {
     switch (body.type) {
       case QuestionTypes.MULTI: {
-        const doc = await this.service.answerMulti(id, body.optionIndex);
+        const doc = await this.service.answerMulti(
+          id,
+          body.optionIndex,
+          user._id
+        );
         user.answerCount++;
         await user.save();
         return res.json(doc);
       }
       case QuestionTypes.YESORNOT: {
-        const doc = await this.service.answerMulti(id, body.optionIndex);
+        const doc = await this.service.answerMulti(
+          id,
+          body.optionIndex,
+          user._id
+        );
         user.answerCount++;
         await user.save();
         return res.json(doc);
       }
       case QuestionTypes.PHOTO_COMPARISON: {
-        const doc = await this.service.answerMulti(id, body.optionIndex);
+        const doc = await this.service.answerMulti(
+          id,
+          body.optionIndex,
+          user._id
+        );
         user.answerCount++;
         await user.save();
         return res.json(doc);

@@ -22,12 +22,15 @@ export class Option {
   key: string;
 }
 
-export class WrittenAnswer {
+export class AnswerObject {
   @Property({ required: true, ref: 'User' })
   answeredBy: Ref<User>;
 
-  @Property({ required: true })
-  answer: string;
+  @Property()
+  answer?: string;
+
+  @Property()
+  index?: number;
 }
 
 export class Question {
@@ -44,8 +47,8 @@ export class Question {
   @Property({ ref: 'User', required: true })
   user: Ref<User>;
 
-  @Property({ items: WrittenAnswer })
-  answers: WrittenAnswer[];
+  @Property({ type: AnswerObject })
+  answers: AnswerObject[];
 
   @Property({ items: Option })
   options: Option[];
@@ -58,6 +61,8 @@ export class Question {
 
   @Property({ type: Date, default: Date.now() })
   createdAt: Date;
+
+  randomUserAvatar?: string;
 }
 
 export const QuestionModel = getModelForClass(Question);
