@@ -28,6 +28,7 @@ import { Option, QuestionTypes } from '../models/Question.model';
 import { User } from '../models/User.model';
 import { uploadMultiple, checkQuestionType } from '../config/S3';
 import { StorageService } from '../services/Storage.service';
+import { withAvatarMany, withoutUser } from '../utils/mixins';
 
 class QuestionInput {
   @IsOptional()
@@ -73,25 +74,11 @@ export class QuestionController {
     @Res() res: Response
   ) {
     try {
-      const docs = (await this.repo.findManyAtRandom({}, num)).filter(
-        (document) =>
-          ((document.user as DocumentType<User>)
-            ._id as ObjectId).toHexString() !==
-          (user._id as ObjectId).toHexString()
-      );
+      const docs = await this.repo.findManyAtRandom({}, num);
 
-      docs.forEach((doc) => {
-        if ((doc.user as DocumentType<User>).avatarList.length > 0) {
-          doc.randomUserAvatar = (doc.user as DocumentType<User>).avatarList[
-            Math.floor(
-              Math.random() * (doc.user as DocumentType<User>).avatarList.length
-            )
-          ].url;
-        }
-        return doc;
-      });
+      const response = await withAvatarMany(withoutUser(docs, user));
 
-      return res.json(docs);
+      return res.json(response);
     } catch (err) {
       console.log(err);
     }

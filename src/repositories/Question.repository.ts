@@ -38,8 +38,7 @@ export class QuestionRepository {
       .find(query)
       .sort('date')
       .limit(limit > 0 ? limit : 1)
-      .skip(magicNumber < collectionSize ? magicNumber : limit)
-      .populate('user');
+      .skip(magicNumber < collectionSize ? magicNumber : limit);
   }
 
   public async findMany(query: MongooseFilterQuery<QuestionQuery>) {
