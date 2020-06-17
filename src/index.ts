@@ -1,6 +1,8 @@
 import 'reflect-metadata';
 import { useExpressServer } from 'routing-controllers';
 import express from 'express';
+import helmet from 'helmet';
+import compression from 'compression';
 import { resolve } from 'path';
 import { config } from 'dotenv';
 import { connect } from 'mongoose';
@@ -25,8 +27,15 @@ import { CurrentUserChecker } from './auth/CurrentUserChecker';
 
   // Setup DI containers
   bootstrapDependencies();
+
   // Create Express server instance
   const app = express();
+
+  // Security middleware
+  app.use(helmet());
+
+  // Compression middleware for reducing response content size
+  app.use(compression());
 
   useExpressServer(app, {
     authorizationChecker: AuthChecker,
