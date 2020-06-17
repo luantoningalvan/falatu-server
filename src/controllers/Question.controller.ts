@@ -14,7 +14,7 @@ import {
   Put,
   UploadedFiles,
   UseBefore,
-  HttpError,
+  NotFoundError,
 } from 'routing-controllers';
 import { IsString, IsOptional, IsEnum } from 'class-validator';
 import { ObjectId } from 'mongodb';
@@ -29,6 +29,7 @@ import { User } from '../models/User.model';
 import { uploadMultiple, checkQuestionType } from '../config/S3';
 import { StorageService } from '../services/Storage.service';
 import { withAvatarMany, withoutUser } from '../utils/mixins';
+import { UploadError, ShapeError, DatabaseError } from '../utils/errors';
 
 class QuestionInput {
   @IsOptional()
@@ -93,11 +94,8 @@ export class QuestionController {
     try {
       const doc = await this.repo.store({ ...body, user: user._id });
       return res.json(doc);
-    } catch (err) {
-      const errResponse = new HttpError(500, err.message);
-      return res
-        .status(errResponse.httpCode)
-        .json({ error: errResponse.message });
+    } catch {
+      throw new DatabaseError();
     }
   }
 
@@ -155,7 +153,7 @@ export class QuestionController {
         return res.json(doc);
       }
       default:
-        return res.json({ error: 'Invalid type or no type provided.' });
+        throw new ShapeError();
     }
   }
 
@@ -186,7 +184,7 @@ export class QuestionController {
         console.log(err);
       }
     }
-    return res.status(400).json({ error: 'No files sent.' });
+    throw new UploadError();
   }
 
   @Delete('/:id')
@@ -197,9 +195,7 @@ export class QuestionController {
   ) {
     const doc = await this.repo.findById(id);
     if (!doc)
-      return res
-        .status(404)
-        .json({ error: 'Cannot delete something that does not exist' });
+      throw new NotFoundError('Cannot delete something that does not exist!');
 
     // Check if question belongs to current user
     if (

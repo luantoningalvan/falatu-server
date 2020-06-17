@@ -1,4 +1,4 @@
-import { Action, UnauthorizedError, HttpError } from 'routing-controllers';
+import { Action, UnauthorizedError } from 'routing-controllers';
 import { getEntityManager } from './EntityManager';
 import { User } from '../models/User.model';
 
@@ -8,6 +8,6 @@ export const CurrentUserChecker = async (action: Action) => {
   if (!token) throw new UnauthorizedError('No access token provided.');
   // Check for existing user for preventing falsy auth requests
   const user = await getEntityManager(User).findOneByToken(token);
-  if (!user) throw new HttpError(403, 'Access denied.');
+  if (!user) throw new UnauthorizedError('Access denied.');
   return user;
 };

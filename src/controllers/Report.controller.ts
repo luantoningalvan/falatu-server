@@ -8,6 +8,7 @@ import {
   Res,
   Patch,
   Delete,
+  UnauthorizedError,
 } from 'routing-controllers';
 import { Response } from 'express';
 import { DocumentType } from '@typegoose/typegoose';
@@ -50,7 +51,7 @@ export class ReportController {
       return res.json(doc);
     }
 
-    return res.status(403).json({ error: 'Access denied.' });
+    throw new UnauthorizedError('Access denied.');
   }
 
   @Patch('/solve/:id')
@@ -64,7 +65,7 @@ export class ReportController {
       return res.json(doc);
     }
 
-    return res.status(403).json({ error: 'Access denied.' });
+    throw new UnauthorizedError('Access denied.');
   }
 
   @Post()
@@ -92,6 +93,6 @@ export class ReportController {
       const doc = await this.repo.delete(id);
       return res.json(doc);
     }
-    return res.status(403).json({ error: 'Access denied.' });
+    throw new UnauthorizedError('Access denied.');
   }
 }

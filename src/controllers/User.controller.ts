@@ -25,6 +25,7 @@ import { DocumentType } from '@typegoose/typegoose';
 // Upload middleware
 import { uploadSingle, checkAvatarListLength } from '../config/S3';
 import { StorageService } from '../services/Storage.service';
+import { UploadError, EntityAlreadyExistsError } from '../utils/errors';
 
 // Input for signing up
 class SignUpInput {
@@ -90,7 +91,7 @@ export class UserController {
     if (user) {
       return res.json({ username: user.username, email: user.email });
     }
-    return res.json({ error: 'User already exists' });
+    throw new EntityAlreadyExistsError();
   }
 
   @Patch('/me')
@@ -118,8 +119,8 @@ export class UserController {
       });
       await user.save();
       return res.json(user);
-    } catch (err) {
-      return res.status(500).json({ error: err.message });
+    } catch {
+      throw new UploadError();
     }
   }
 
