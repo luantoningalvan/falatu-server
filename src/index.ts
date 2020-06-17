@@ -1,12 +1,24 @@
 import 'reflect-metadata';
 import { useExpressServer } from 'routing-controllers';
 import express from 'express';
+
+// Middlewares
 import helmet from 'helmet';
 import compression from 'compression';
+import rateLimit from 'express-rate-limit';
+import MongoStore from 'rate-limit-mongo';
+
+// Utilities
 import { resolve } from 'path';
 import { config } from 'dotenv';
+
+// Database
 import { connect } from 'mongoose';
+
+// Dependencies
 import { bootstrapDependencies } from './container';
+
+// Authentication
 import { AuthChecker } from './auth/AuthChecker';
 import { CurrentUserChecker } from './auth/CurrentUserChecker';
 
@@ -31,8 +43,26 @@ import { CurrentUserChecker } from './auth/CurrentUserChecker';
   // Create Express server instance
   const app = express();
 
+  // Configuration for proxy
+  // This is because we run the production server behind a reverse proxy.
+  if (IS_PROD) {
+    app.set('trust proxy', 1);
+  }
+
   // Security middleware
   app.use(helmet());
+
+  // Rate limiting: 10 requests/second
+  app.use(
+    rateLimit({
+      store: new MongoStore({
+        uri: DB_URL,
+        collectionName: 'rateLimitRecords',
+      }),
+      windowMs: 1000,
+      max: 10,
+    })
+  );
 
   // Compression middleware for reducing response content size
   app.use(compression());
