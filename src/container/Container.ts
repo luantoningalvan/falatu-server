@@ -16,6 +16,7 @@ import { UserService } from '../services/User.service';
 
 // Providers
 import { StorageProvider } from '../providers/Storage.provider';
+import { MailProvider } from '../providers/Mail.provider';
 
 export function bootstrapDependencies(): void {
   // Set repositories
@@ -31,6 +32,7 @@ export function bootstrapDependencies(): void {
 
   // Set providers
   Container.set(StorageProvider, new StorageProvider());
+  Container.set(MailProvider, new MailProvider());
 
   RCUseContainer(Container);
   CVUseContainer(Container);

@@ -87,10 +87,14 @@ export class UserController {
 
   @Post('/signup')
   public async signUp(@Body() body: SignUpInput, @Res() res: Response) {
-    const user = await this.repo.store(body);
+    const user = await this.service.register(body);
+
+    // On success
     if (user) {
       return res.json({ username: user.username, email: user.email });
     }
+
+    // On fail
     throw new EntityAlreadyExistsError();
   }
 
