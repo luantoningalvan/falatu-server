@@ -88,7 +88,7 @@ import { CurrentUserChecker } from './auth/CurrentUserChecker';
   app.listen(parseInt(PORT), () => {
     console.log(
       [
-        `WDYT Server rodando na porta ${PORT}`,
+        `FalaTu API rodando na porta ${PORT}`,
         'Versão 1.0.0 por Vini Franco e Luan Tonin Galvan',
       ].join('\n')
     );
