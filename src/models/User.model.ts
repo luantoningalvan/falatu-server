@@ -45,9 +45,26 @@ export class User {
   @Property({ type: Array, default: [] })
   avatarList: AvatarObject[];
 
+  @Property({ select: false })
+  passwordResetToken: string;
+
+  @Property({ select: false, type: Date })
+  passwordResetExpires: Date;
+
   // Method for verifying password on authentication
   public async verifyPassword(password: string) {
     return await argon2.verify(this.password, password);
+  }
+
+  // Method for verifying password reset token validity
+  public verifyPasswordResetToken(token: string) {
+    if (token === this.passwordResetToken) {
+      if (Date.now() > this.passwordResetExpires.getTime()) {
+        return false;
+      }
+      return true;
+    }
+    return false;
   }
 }
 

@@ -10,6 +10,10 @@ import { MailProvider } from '../providers/Mail.provider';
 
 // Notifications
 import { UserRegistered } from '../notifications/UserRegistered';
+import { PasswordResetRequest } from '../notifications/PasswordResetRequest';
+
+// Utilities
+import { Crypto } from '../utils/misc/Crypto';
 
 interface FileFromS3 extends Express.Multer.File {
   Key: string;
@@ -33,7 +37,7 @@ export class UserService {
     const notification = new UserRegistered(user.name);
 
     // Send greeting mail
-    await this.mail.send(notification, { email: user.email });
+    await this.mail.send<UserRegistered>(notification, { email: user.email });
 
     // Return created user
     return user;
@@ -72,5 +76,49 @@ export class UserService {
     // Save changes
     await user.save();
     return user;
+  }
+
+  public async generatePasswordResetToken(user: DocumentType<User>) {
+    const token = Crypto.token();
+    const expiryDate = Date.now() + 86400000; // 1 day
+
+    // Assign reset data
+    user.passwordResetToken = token;
+    user.passwordResetExpires = new Date(expiryDate);
+
+    // Send mail notification
+    const notification = new PasswordResetRequest(user.name, token);
+    await this.mail.send<PasswordResetRequest>(notification, {
+      email: user.email,
+    });
+
+    // Save changes
+    await user.save();
+    return user;
+  }
+
+  public async attemptPasswordReset(token: string, newPassword: string) {
+    const user = await this.repo.findWithPassword({
+      passwordResetToken: token,
+    });
+
+    console.log(user);
+
+    // If user is not found, abort
+    if (!user) return false;
+
+    // Check for token expiry date
+    if (user.verifyPasswordResetToken(token)) {
+      user.password = newPassword;
+      user.passwordResetToken = undefined;
+      user.passwordResetExpires = undefined;
+      await user.save();
+
+      // On success
+      return true;
+    }
+
+    // If it fails
+    return false;
   }
 }

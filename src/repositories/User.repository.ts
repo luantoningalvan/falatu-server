@@ -33,7 +33,9 @@ export class UserRepository {
   }
 
   public async findWithPassword(query: UserQuery) {
-    return await this.model.findOne(query).select('+password');
+    return await this.model
+      .findOne(query)
+      .select('+password passwordResetToken passwordResetExpires');
   }
 
   public async findAndUpdate(id: string, query: UserQuery) {

@@ -13,6 +13,7 @@ import {
   UploadedFile,
   UseBefore,
   Delete,
+  UnauthorizedError,
 } from 'routing-controllers';
 import { Request, Response } from 'express';
 import { IsEmail, IsString, IsOptional } from 'class-validator';
@@ -26,6 +27,14 @@ import { DocumentType } from '@typegoose/typegoose';
 import { uploadSingle, checkAvatarListLength } from '../config/S3';
 import { UploadError, EntityAlreadyExistsError } from '../utils/errors';
 import { UserService } from '../services/User.service';
+
+class PasswordResetInput {
+  @IsString()
+  token: string;
+
+  @IsString()
+  newPassword: string;
+}
 
 // Input for signing up
 class SignUpInput {
@@ -96,6 +105,30 @@ export class UserController {
 
     // On fail
     throw new EntityAlreadyExistsError();
+  }
+
+  @Post('/forgot')
+  public async requestPasswordReset(
+    @CurrentUser({ required: true }) user: DocumentType<User>,
+    @Res() res: Response
+  ) {
+    const response = await this.service.generatePasswordResetToken(user);
+    return res.json(response);
+  }
+
+  @Patch('/forgot')
+  public async attemptPasswordReset(
+    @Body() body: PasswordResetInput,
+    @Res() res: Response
+  ) {
+    const response = await this.service.attemptPasswordReset(
+      body.token,
+      body.newPassword
+    );
+
+    if (response) return res.json({ reset: true });
+
+    throw new UnauthorizedError('Invalid token provided.');
   }
 
   @Patch('/me')
