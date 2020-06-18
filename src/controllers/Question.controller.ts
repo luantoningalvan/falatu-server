@@ -27,7 +27,7 @@ import { QuestionService } from '../services/Question.service';
 import { Option, QuestionTypes } from '../models/Question.model';
 import { User } from '../models/User.model';
 import { uploadMultiple, checkQuestionType } from '../config/S3';
-import { StorageService } from '../services/Storage.service';
+import { StorageProvider } from '../providers/Storage.provider';
 import { withAvatarMany, withoutUser } from '../utils/mixins';
 import { UploadError, ShapeError, DatabaseError } from '../utils/errors';
 
@@ -47,7 +47,7 @@ export class QuestionController {
   constructor(
     private readonly repo: QuestionRepository,
     private readonly service: QuestionService,
-    private readonly storage: StorageService
+    private readonly storage: StorageProvider
   ) {}
 
   @Authorized()

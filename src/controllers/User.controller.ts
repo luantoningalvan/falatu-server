@@ -24,8 +24,8 @@ import { DocumentType } from '@typegoose/typegoose';
 
 // Upload middleware
 import { uploadSingle, checkAvatarListLength } from '../config/S3';
-import { StorageService } from '../services/Storage.service';
 import { UploadError, EntityAlreadyExistsError } from '../utils/errors';
+import { UserService } from '../services/User.service';
 
 // Input for signing up
 class SignUpInput {
@@ -61,7 +61,7 @@ export class UserController {
   // Inject dependencies on construct
   constructor(
     private readonly repo: UserRepository,
-    private readonly storage: StorageService
+    private readonly service: UserService
   ) {}
 
   @Get('/all')
@@ -112,13 +112,8 @@ export class UserController {
     @CurrentUser({ required: true }) user: DocumentType<User>
   ) {
     try {
-      user.avatarList.push({
-        url: file.Location,
-        key: file.Key,
-        index: user.avatarList.length + 1,
-      });
-      await user.save();
-      return res.json(user);
+      const response = await this.service.assignNewAvatarPicture(user, file);
+      return res.json(response);
     } catch {
       throw new UploadError();
     }
@@ -130,17 +125,7 @@ export class UserController {
     @Res() res: Response,
     @Param('index') index: number
   ) {
-    // Remove indicated picture from storage
-    await this.storage.deleteObject(user.avatarList[index].key);
-    // Remove picture from array
-    user.avatarList.splice(index, 1);
-    // Iterate to rearrange
-    user.avatarList.forEach((avatar) => {
-      if (avatar.index > index) {
-        avatar.index -= 1;
-      }
-    });
-    await user.save();
-    return res.json(user);
+    const response = await this.service.removeAvatarPicture(user, index);
+    return res.json(response);
   }
 }

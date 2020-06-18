@@ -8,7 +8,7 @@ interface DeleteObjectParams {
 }
 
 @Service()
-export class StorageService {
+export class StorageProvider {
   private readonly storage: typeof s3;
 
   constructor() {
