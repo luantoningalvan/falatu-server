@@ -85,6 +85,16 @@ export class QuestionController {
     }
   }
 
+  @Authorized()
+  @Get('/:id/recent')
+  public async getRecentAnsweredQuestions(
+    @Param('id') id: string,
+    @Res() res: Response
+  ) {
+    const docs = await this.repo.getRecentAnsweredQuestions(id);
+    return res.json(docs);
+  }
+
   @Post()
   public async newQuestion(
     @CurrentUser({ required: true }) user: DocumentType<User>,

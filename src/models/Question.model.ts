@@ -1,5 +1,6 @@
 import { getModelForClass, prop as Property, Ref } from '@typegoose/typegoose';
 import { User } from './User.model';
+import { TypeSafeTimestamps } from '../utils/misc/TypeSafeTimestamps';
 
 export enum QuestionTypes {
   YESORNOT = 'yesornot',
@@ -22,7 +23,7 @@ export class Option {
   key: string;
 }
 
-export class AnswerObject {
+export class AnswerObject extends TypeSafeTimestamps {
   @Property({ required: true, ref: 'User' })
   answeredBy: Ref<User>;
 
@@ -33,7 +34,7 @@ export class AnswerObject {
   index?: number;
 }
 
-export class Question {
+export class Question extends TypeSafeTimestamps {
   @Property({ required: true })
   title: string;
 

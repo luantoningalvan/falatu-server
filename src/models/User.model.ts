@@ -51,6 +51,9 @@ export class User {
   @Property({ select: false, type: Date })
   passwordResetExpires: Date;
 
+  // Calculated properties (not returned as virtuals)
+  questionCount?: number;
+
   // Method for verifying password on authentication
   public async verifyPassword(password: string) {
     return await argon2.verify(this.password, password);

@@ -27,6 +27,7 @@ import { DocumentType } from '@typegoose/typegoose';
 import { uploadSingle, checkAvatarListLength } from '../config/S3';
 import { UploadError, EntityAlreadyExistsError } from '../utils/errors';
 import { UserService } from '../services/User.service';
+import { withQuestionCount } from '../utils/mixins';
 
 class PasswordResetInput {
   @IsString()
@@ -91,7 +92,8 @@ export class UserController {
   @Get('/:id')
   public async getUser(@Param('id') id: string, @Res() res: Response) {
     const doc = await this.repo.findById(id);
-    return res.json(doc);
+    const response = await withQuestionCount(doc);
+    return res.json(response);
   }
 
   @Post('/signup')
@@ -138,7 +140,8 @@ export class UserController {
     @CurrentUser({ required: true }) user: DocumentType<User>
   ) {
     const doc = await this.repo.findAndUpdate(user._id, body);
-    return res.json(doc);
+    const response = await withQuestionCount(doc);
+    return res.json(response);
   }
 
   @Put('/avatar')

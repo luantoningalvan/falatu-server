@@ -52,4 +52,24 @@ export class QuestionRepository {
   public async delete(id: string) {
     return await this.model.findByIdAndDelete(id);
   }
+
+  // Scoped actions
+
+  /**
+   * Retrieves the last 5 answered questions for a given user.
+   * @param id the desired user's id.
+   */
+  public async getRecentAnsweredQuestions(id: string) {
+    const questions = await this.model
+      .find({ user: id })
+      .sort({ updatedAt: -1 })
+      .limit(5);
+
+    return questions;
+  }
+
+  public async getQuestionCount(id: string) {
+    const count = await this.model.where('user', id).countDocuments();
+    return count;
+  }
 }
