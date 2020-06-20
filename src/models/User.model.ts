@@ -36,13 +36,19 @@ export class User {
   @Property()
   name: string;
 
-  @Property({ default: 'user', enum: ['user', 'admin'], select: false })
+  @Property({
+    type: Array,
+    items: String,
+    default: 'user',
+    enum: ['user', 'admin'],
+    select: false,
+  })
   roles: string[];
 
   @Property({ default: 0 })
   answerCount: number;
 
-  @Property({ type: Array, default: [] })
+  @Property({ type: Array, items: AvatarObject })
   avatarList: AvatarObject[];
 
   @Property({ select: false })
