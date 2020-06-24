@@ -6,11 +6,11 @@ const sass = require('gulp-sass');
 const tsProject = ts.createProject('tsconfig.json');
 
 function typescript() {
-  return tsProject.src().pipe(tsProject()).js.pipe(gulp.dest('build'));
+  return gulp.src('src/**/*.ts').pipe(tsProject()).js.pipe(gulp.dest('build'));
 }
 
 function copyTemplates(cb) {
-  gulp.src('./src/resources/**/**.pug').pipe(gulp.dest('build/src/resources'));
+  gulp.src('./src/resources/**/**.pug').pipe(gulp.dest('build/resources'));
   cb();
 }
 
