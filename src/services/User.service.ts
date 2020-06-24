@@ -88,9 +88,16 @@ export class UserService {
 
     // Send mail notification
     const notification = new PasswordResetRequest(user.name, token);
-    await this.mail.send<PasswordResetRequest>(notification, {
-      email: user.email,
-    });
+    await this.mail.send<PasswordResetRequest>(
+      notification,
+      {
+        email: user.email,
+        name: user.name,
+      },
+      {
+        token: notification.action,
+      }
+    );
 
     // Save changes
     await user.save();

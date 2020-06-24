@@ -1,9 +1,11 @@
 import { Service } from 'typedi';
 import { transport } from '../config/Mailer';
 import { Notification } from '../notifications/Notification';
+import Email from 'email-templates';
 
 interface Recipient {
   email: string;
+  name?: string;
 }
 
 @Service()
@@ -16,13 +18,27 @@ export class MailProvider {
 
   public async send<T extends Notification>(
     notification: T,
-    recipient: Recipient
+    recipient: Recipient,
+    locals?: { [k: string]: any }
   ) {
-    await this.mailer.sendMail({
-      from: 'FalaTu <oi@falatu.fyi>',
-      to: recipient.email,
-      subject: notification.subject,
-      text: notification.getContent(),
+    const msg = new Email({
+      message: {
+        from: 'oi@falatu.fyi',
+      },
+      send: true,
+      transport: this.mailer,
+    });
+
+    await msg.send({
+      template: notification.templatePath,
+      message: {
+        to: recipient.email,
+      },
+      locals: {
+        name: recipient.name,
+        email: recipient.email,
+        ...locals,
+      },
     });
   }
 }

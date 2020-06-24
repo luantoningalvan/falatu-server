@@ -1,10 +1,18 @@
 import { Notification } from './Notification';
+import { resolve } from 'path';
 
 export class UserRegistered extends Notification {
   constructor(name: string) {
-    super('Boas-vindas ao FalaTu', name);
+    super(
+      'Boas-vindas ao FalaTu',
+      name,
+      resolve(__dirname, '..', 'resources', 'emails', 'welcome')
+    );
   }
 
+  /**
+   * @deprecated
+   */
   public getContent() {
     return `
       Olá, ${this.greeting}!

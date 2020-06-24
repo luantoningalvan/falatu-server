@@ -1,10 +1,19 @@
 import { Notification } from './Notification';
+import { resolve } from 'path';
 
 export class PasswordResetRequest extends Notification {
   constructor(greeting: string, token: string) {
-    super('Recuperação de senha do FalaTu', greeting, token);
+    super(
+      'Recuperação de senha do FalaTu',
+      greeting,
+      resolve(__dirname, '..', 'resources', 'emails', 'passwordReset'),
+      token
+    );
   }
 
+  /**
+   * @deprecated
+   */
   public getContent() {
     return `
       Olá, ${this.greeting}!
