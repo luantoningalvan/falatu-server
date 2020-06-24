@@ -1,5 +1,9 @@
 import { Service } from 'typedi';
-import { Question, QuestionModel } from '../models/Question.model';
+import {
+  Question,
+  QuestionModel,
+  AnswerObject,
+} from '../models/Question.model';
 import { mongoose } from '@typegoose/typegoose';
 import { MongooseFilterQuery } from 'mongoose';
 
@@ -66,6 +70,19 @@ export class QuestionRepository {
       .limit(5);
 
     return questions;
+  }
+
+  public async getRecentAnswers(id: string) {
+    const questions = await this.getRecentAnsweredQuestions(id);
+    const arr: AnswerObject[] = [];
+
+    questions.forEach((question) => {
+      arr.push(...question.answers);
+    });
+
+    arr.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+    return arr.slice(0, arr.length >= 5 ? 4 : arr.length);
   }
 
   public async getQuestionCount(id: string) {

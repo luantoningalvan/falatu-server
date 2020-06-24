@@ -102,8 +102,6 @@ export class UserService {
       passwordResetToken: token,
     });
 
-    console.log(user);
-
     // If user is not found, abort
     if (!user) return false;
 

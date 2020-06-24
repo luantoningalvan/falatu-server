@@ -86,12 +86,12 @@ export class QuestionController {
   }
 
   @Authorized()
-  @Get('/:id/recent')
-  public async getRecentAnsweredQuestions(
-    @Param('id') id: string,
+  @Get('/recent')
+  public async getRecentAnswered(
+    @CurrentUser({ required: true }) user: DocumentType<User>,
     @Res() res: Response
   ) {
-    const docs = await this.repo.getRecentAnsweredQuestions(id);
+    const docs = await this.repo.getRecentAnswers(user._id);
     return res.json(docs);
   }
 
