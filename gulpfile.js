@@ -18,7 +18,7 @@ function styles(cb) {
   gulp
     .src('./src/resources/styles/**/*.scss')
     .pipe(sass().on('error', sass.logError))
-    .pipe(gulp.dest('build/src/resources/styles'));
+    .pipe(gulp.dest('build/resources/styles'));
   cb();
 }
 
