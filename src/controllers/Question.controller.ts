@@ -28,7 +28,7 @@ import { Option, QuestionTypes } from '../models/Question.model';
 import { User } from '../models/User.model';
 import { uploadMultiple, checkQuestionType } from '../config/S3';
 import { StorageProvider } from '../providers/Storage.provider';
-import { withAvatarMany, withoutUser } from '../utils/mixins';
+import { withAvatarMany, withoutUser, withoutUserField } from '../utils/mixins';
 import { UploadError, ShapeError, DatabaseError } from '../utils/errors';
 
 class QuestionInput {
@@ -79,7 +79,7 @@ export class QuestionController {
 
       const response = await withAvatarMany(withoutUser(docs, user));
 
-      return res.json(response);
+      return res.json(withoutUserField(response));
     } catch (err) {
       console.log(err);
     }

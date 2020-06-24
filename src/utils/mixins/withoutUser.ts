@@ -16,3 +16,15 @@ export function withoutUser(
 
   return result;
 }
+
+export function withoutUserField(input: DocumentType<Question>[]) {
+  const res = input;
+
+  res.forEach((doc) => {
+    const newDoc = doc;
+    newDoc.user = undefined;
+    doc = newDoc;
+  });
+
+  return res;
+}
