@@ -1,6 +1,5 @@
 import { Container } from 'typedi';
 import { DocumentType } from '@typegoose/typegoose';
-import { ObjectId } from 'mongodb';
 import { Question } from '../../models/Question.model';
 import { UserRepository } from '../../repositories/User.repository';
 
@@ -20,18 +19,17 @@ export async function withAvatar(input: DocumentType<Question>) {
 
     public async attachRandomAvatar() {
       const user = await this.userRepo.findById(
-        (input.user as ObjectId).toHexString()
+        (input.user as unknown) as string
       );
       const listLength = user.avatarList.length;
-      if (listLength === 0) {
-        this.document.randomUserAvatar = null;
-        return this.document;
-      } else {
-        const randomNumber = Math.floor(Math.random() * listLength);
-        const randomAvatar = randomNumber > listLength - 1 ? 0 : randomNumber;
-        this.document.randomUserAvatar = user.avatarList[randomAvatar].url;
-        return this.document;
-      }
+      const randomNumber = Math.floor(Math.random() * listLength);
+
+      if (user.avatarList.length === 0) return this.document;
+
+      return {
+        ...this.document.toObject(),
+        randomUserAvatar: user.avatarList[randomNumber],
+      } as DocumentType<Question>;
     }
   }
 
@@ -53,21 +51,14 @@ export async function withAvatarMany(input: DocumentType<Question>[]) {
     }
 
     public async attachRandomAvatar() {
-      this.documents.forEach(async (document) => {
-        const user = await this.userRepo.findById(
-          (document.user as ObjectId).toHexString()
-        );
-        const listLength = user.avatarList.length;
-        if (listLength === 0) {
-          document.randomUserAvatar = null;
-        } else {
-          const randomNumber = Math.floor(Math.random() * listLength);
-          const randomAvatar = randomNumber > listLength - 1 ? 0 : randomNumber;
-          document.randomUserAvatar = user.avatarList[randomAvatar].url;
-        }
-      });
+      const arr = [];
 
-      return this.documents;
+      for (const document of this.documents) {
+        const newDoc = await withAvatar(document);
+        arr.push(newDoc);
+      }
+
+      return arr;
     }
   }
 

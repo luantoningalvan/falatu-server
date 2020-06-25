@@ -48,7 +48,7 @@ export class Question extends TypeSafeTimestamps {
   @Property({ ref: 'User', required: true, select: false })
   user: Ref<User>;
 
-  @Property({ type: AnswerObject })
+  @Property({ type: AnswerObject, select: false })
   answers: AnswerObject[];
 
   @Property({ items: Option })

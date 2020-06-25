@@ -67,6 +67,7 @@ export class QuestionRepository {
   public async getRecentAnsweredQuestions(id: string) {
     const questions = await this.model
       .find({ user: id })
+      .select('answers')
       .sort({ updatedAt: -1 })
       .limit(5);
 
