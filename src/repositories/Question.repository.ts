@@ -46,6 +46,10 @@ export class QuestionRepository {
       .skip(magicNumber < collectionSize ? magicNumber : limit);
   }
 
+  public async findWithAnswers(query: MongooseFilterQuery<QuestionQuery>) {
+    return await this.model.find(query).select('+answers +user');
+  }
+
   public async findMany(query: MongooseFilterQuery<QuestionQuery>) {
     return await this.model.find(query);
   }

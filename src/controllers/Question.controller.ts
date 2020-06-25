@@ -114,7 +114,7 @@ export class QuestionController {
     @CurrentUser({ required: true }) user: DocumentType<User>,
     @Res() res: Response
   ) {
-    const docs = await this.repo.findMany({ user: user._id });
+    const docs = await this.repo.findWithAnswers({ user: user._id });
     return res.json(docs);
   }
 
