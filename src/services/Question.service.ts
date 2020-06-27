@@ -25,7 +25,7 @@ export class QuestionService {
   }
 
   public async answerMulti(id: string, optionIndex: number, who: string) {
-    const doc = await this.repo.findById(id);
+    const doc = await this.repo.findOneWithAnswers({ _id: id });
     doc.options[optionIndex].answerCount++;
     doc.answers.push({ index: optionIndex, answeredBy: new ObjectId(who) });
     await doc.save();

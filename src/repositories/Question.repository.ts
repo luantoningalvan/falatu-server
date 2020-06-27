@@ -50,6 +50,10 @@ export class QuestionRepository {
     return await this.model.find(query).select('+answers +user');
   }
 
+  public async findOneWithAnswers(query: MongooseFilterQuery<QuestionQuery>) {
+    return await this.model.findOne(query).select('+answers');
+  }
+
   public async findMany(query: MongooseFilterQuery<QuestionQuery>) {
     return await this.model.find(query);
   }
