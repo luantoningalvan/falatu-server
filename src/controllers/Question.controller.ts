@@ -11,9 +11,7 @@ import {
   Authorized,
   Delete,
   Patch,
-  Put,
   UploadedFiles,
-  UseBefore,
   NotFoundError,
 } from 'routing-controllers';
 import { IsString, IsOptional, IsEnum } from 'class-validator';
@@ -26,7 +24,7 @@ import { QuestionService } from '../services/Question.service';
 // Model types
 import { Option, QuestionTypes } from '../models/Question.model';
 import { User } from '../models/User.model';
-import { uploadMultiple, checkQuestionType } from '../config/S3';
+import { uploadMultiple } from '../config/S3';
 import { StorageProvider } from '../providers/Storage.provider';
 import { withAvatarMany, withoutUser, withoutUserField } from '../utils/mixins';
 import { UploadError, ShapeError, DatabaseError } from '../utils/errors';
@@ -98,12 +96,35 @@ export class QuestionController {
   @Post()
   public async newQuestion(
     @CurrentUser({ required: true }) user: DocumentType<User>,
+    @UploadedFiles('files', { options: uploadMultiple })
+    files: Express.Multer.File[],
     @Body() body: QuestionInput,
     @Res() res: Response
   ) {
     try {
-      const doc = await this.repo.store({ ...body, user: user._id });
-      return res.json(doc);
+      const question = await this.repo.store({ ...body, user: user._id });
+      if (
+        files &&
+        files.length > 0 &&
+        body.type === QuestionTypes.PHOTO_COMPARISON
+      ) {
+        try {
+          console.log(files[0]);
+          // First file
+          question.options[0].url = (files[0] as any).Location;
+          question.options[0].key = (files[0] as any).Key;
+          // Second file
+          question.options[1].url = (files[1] as any).Location;
+          question.options[1].key = (files[1] as any).Key;
+          // It was done separately because only two files are supported.
+          await question.save();
+          return res.json(question);
+        } catch (err) {
+          console.log(err);
+        }
+        throw new UploadError();
+      }
+      return res.json(question);
     } catch {
       throw new DatabaseError();
     }
@@ -167,35 +188,35 @@ export class QuestionController {
     }
   }
 
-  @UseBefore(checkQuestionType)
-  @Put('/pictures/:id')
-  public async uploadPhotoComparisonPictures(
-    @CurrentUser({ required: true }) user: DocumentType<User>,
-    @Res() res: Response,
-    @UploadedFiles('files', { options: uploadMultiple })
-    files: Express.Multer.File[],
-    @Param('id') id: string
-  ) {
-    if (files && files.length > 0) {
-      console.log(files);
-      try {
-        const question = await this.repo.findById(id);
-        console.log(files[0]);
-        // First file
-        question.options[0].url = (files[0] as any).Location;
-        question.options[0].key = (files[0] as any).Key;
-        // Second file
-        question.options[1].url = (files[1] as any).Location;
-        question.options[1].key = (files[1] as any).Key;
-        // It was done separately because only two files are supported.
-        await question.save();
-        return res.json(question);
-      } catch (err) {
-        console.log(err);
-      }
-    }
-    throw new UploadError();
-  }
+  // @UseBefore(checkQuestionType)
+  // @Put('/pictures/:id')
+  // public async uploadPhotoComparisonPictures(
+  //   @CurrentUser({ required: true }) user: DocumentType<User>,
+  //   @Res() res: Response,
+  //   @UploadedFiles('files', { options: uploadMultiple })
+  //   files: Express.Multer.File[],
+  //   @Param('id') id: string
+  // ) {
+  //   if (files && files.length > 0) {
+  //     console.log(files);
+  //     try {
+  //       const question = await this.repo.findById(id);
+  //       console.log(files[0]);
+  //       // First file
+  //       question.options[0].url = (files[0] as any).Location;
+  //       question.options[0].key = (files[0] as any).Key;
+  //       // Second file
+  //       question.options[1].url = (files[1] as any).Location;
+  //       question.options[1].key = (files[1] as any).Key;
+  //       // It was done separately because only two files are supported.
+  //       await question.save();
+  //       return res.json(question);
+  //     } catch (err) {
+  //       console.log(err);
+  //     }
+  //   }
+  //   throw new UploadError();
+  // }
 
   @Delete('/:id')
   public async deleteQuestion(

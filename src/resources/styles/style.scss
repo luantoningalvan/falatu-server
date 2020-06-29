@@ -1,5 +1,32 @@
-body {
-  p {
-    padding: 1em;
-  }
+
+ $pink: #D90368;
+ $lilac: #F7ACCF;
+ $purple: #543A6A;
+ $dark: #1A1423;
+ $grey: #E5E5E5;
+
+* {
+  font-family: 'Comfortaa', Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  color: $dark;
+}
+
+.button {
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  margin: 1em 0;
+  font-family: 'Comfortaa-Bold', Arial, Helvetica, sans-serif;
+}
+
+.primary-button {
+  background-color: $pink;
+  color: white;
+}
+
+.secondary-button {
+  border-color: $lilac;
+  color: $lilac;
+  background-color: white;
 }

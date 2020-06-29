@@ -37,7 +37,10 @@ export class UserService {
     const notification = new UserRegistered(user.name);
 
     // Send greeting mail
-    await this.mail.send<UserRegistered>(notification, { email: user.email });
+    await this.mail.send<UserRegistered>(notification, {
+      email: user.email,
+      name: user.name,
+    });
 
     // Return created user
     return user;
