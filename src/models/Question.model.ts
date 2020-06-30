@@ -11,16 +11,16 @@ export enum QuestionTypes {
 
 export class Option {
   @Property({ default: 0, type: Number })
-  answerCount: number;
+  answerCount?: number;
 
   @Property()
   title: string;
 
   @Property()
-  url: string;
+  url?: string;
 
   @Property()
-  key: string;
+  key?: string;
 }
 
 export class AnswerObject extends TypeSafeTimestamps {

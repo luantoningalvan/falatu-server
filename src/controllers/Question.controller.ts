@@ -22,7 +22,7 @@ import { QuestionRepository } from '../repositories/Question.repository';
 import { QuestionService } from '../services/Question.service';
 
 // Model types
-import { Option, QuestionTypes } from '../models/Question.model';
+import { QuestionTypes } from '../models/Question.model';
 import { User } from '../models/User.model';
 import { uploadMultiple } from '../config/S3';
 import { StorageProvider } from '../providers/Storage.provider';
@@ -31,7 +31,13 @@ import { UploadError, ShapeError, DatabaseError } from '../utils/errors';
 
 class QuestionInput {
   @IsOptional()
-  options: Option[];
+  title1: string;
+
+  @IsOptional()
+  title2: string;
+
+  @IsOptional()
+  title3: string;
 
   @IsString()
   title: string;
@@ -96,36 +102,81 @@ export class QuestionController {
   @Post()
   public async newQuestion(
     @CurrentUser({ required: true }) user: DocumentType<User>,
+    @Body() body: QuestionInput,
     @UploadedFiles('files', { options: uploadMultiple })
     files: Express.Multer.File[],
-    @Body() body: QuestionInput,
     @Res() res: Response
   ) {
+    // eslint-disable-next-line prefer-const
+    let { title, type, title1, title2, title3 } = body;
+    const [fileOne, fileTwo] = files as any[];
+
     try {
-      const question = await this.repo.store({ ...body, user: user._id });
-      if (
-        files &&
-        files.length > 0 &&
-        body.type === QuestionTypes.PHOTO_COMPARISON
-      ) {
-        try {
-          console.log(files[0]);
-          // First file
-          question.options[0].url = (files[0] as any).Location;
-          question.options[0].key = (files[0] as any).Key;
-          // Second file
-          question.options[1].url = (files[1] as any).Location;
-          question.options[1].key = (files[1] as any).Key;
-          // It was done separately because only two files are supported.
-          await question.save();
+      switch (type) {
+        case QuestionTypes.MULTI: {
+          if (!title1 && !title2 && !title3) {
+            throw new ShapeError();
+          }
+
+          const question = await this.repo.store({
+            title,
+            type,
+            user: user._id,
+            options: [
+              { title: title1 },
+              { title: title2 },
+              { title: title3 || '' },
+            ],
+          });
+
           return res.json(question);
-        } catch (err) {
-          console.log(err);
         }
-        throw new UploadError();
+        case QuestionTypes.WRITTEN: {
+          const question = await this.repo.store({
+            title,
+            type,
+            user: user._id,
+            options: [],
+          });
+          return res.json(question);
+        }
+        case QuestionTypes.YESORNOT: {
+          const question = await this.repo.store({
+            title,
+            type,
+            user: user._id,
+            options: [{ title: 'Sim' }, { title: 'Não' }],
+          });
+
+          return res.json(question);
+        }
+        case QuestionTypes.PHOTO_COMPARISON: {
+          const question = await this.repo.store({
+            title,
+            type,
+            user: user._id,
+            options: [{ title: '' }, { title: '' }],
+          });
+
+          const options = question.options;
+
+          if (files.length > 0) {
+            // For first photo
+            options[0].url = fileOne.Location;
+            options[0].title = fileOne.Key;
+            // For second photo
+            options[1].url = fileTwo.Location;
+            options[1].title = fileTwo.Key;
+
+            await question.save();
+
+            return res.json(question.toObject());
+          }
+          throw new UploadError();
+        }
       }
-      return res.json(question);
-    } catch {
+    } catch (err) {
+      console.log(err);
       throw new DatabaseError();
     }
   }
@@ -187,36 +238,6 @@ export class QuestionController {
         throw new ShapeError();
     }
   }
-
-  // @UseBefore(checkQuestionType)
-  // @Put('/pictures/:id')
-  // public async uploadPhotoComparisonPictures(
-  //   @CurrentUser({ required: true }) user: DocumentType<User>,
-  //   @Res() res: Response,
-  //   @UploadedFiles('files', { options: uploadMultiple })
-  //   files: Express.Multer.File[],
-  //   @Param('id') id: string
-  // ) {
-  //   if (files && files.length > 0) {
-  //     console.log(files);
-  //     try {
-  //       const question = await this.repo.findById(id);
-  //       console.log(files[0]);
-  //       // First file
-  //       question.options[0].url = (files[0] as any).Location;
-  //       question.options[0].key = (files[0] as any).Key;
-  //       // Second file
-  //       question.options[1].url = (files[1] as any).Location;
-  //       question.options[1].key = (files[1] as any).Key;
-  //       // It was done separately because only two files are supported.
-  //       await question.save();
-  //       return res.json(question);
-  //     } catch (err) {
-  //       console.log(err);
-  //     }
-  //   }
-  //   throw new UploadError();
-  // }
 
   @Delete('/:id')
   public async deleteQuestion(
