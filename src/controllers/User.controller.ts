@@ -85,7 +85,8 @@ export class UserController {
     @CurrentUser({ required: true }) me: DocumentType<User>,
     @Res() res: Response
   ) {
-    return res.json(me);
+    const user = await withQuestionCount(me);
+    return res.json(user);
   }
 
   @Authorized()

@@ -96,7 +96,7 @@ export class QuestionRepository {
   }
 
   public async getQuestionCount(id: string) {
-    const count = await this.model.where('user', id).countDocuments();
-    return count;
+    const count = await this.model.find({ user: id }).select('+user');
+    return count.length;
   }
 }

@@ -15,12 +15,14 @@ export async function withQuestionCount(input: DocumentType<User>) {
 
     public async appendQuestionCount() {
       const count = await this.repo.getQuestionCount(this.input._id);
-      this.input.questionCount = count;
+      console.log(count);
       return { ...this.input.toObject(), questionCount: count } as DocumentType<
         User
       >;
     }
   }
 
-  return await new withQuestionCountClass().appendQuestionCount();
+  const instance = new withQuestionCountClass();
+  const response = await instance.appendQuestionCount();
+  return response;
 }
