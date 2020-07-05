@@ -18,7 +18,7 @@ export class QuestionService {
   }
 
   public async answerWritten(id: string, answer: string, who: string) {
-    const doc = await this.repo.findById(id);
+    const doc = await this.repo.findOneWithAnswers({ id });
     doc.answers.push({ answer, answeredBy: new ObjectId(who) });
     await doc.save();
     return doc;
