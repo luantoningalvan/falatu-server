@@ -86,11 +86,18 @@ export class QuestionController {
     try {
       const docs = await this.repo.findManyAtRandom({}, num);
 
-      const response = await withAvatarMany(withoutUser(docs, user));
+      const withAvatars = await withAvatarMany(withoutUser(docs, user));
 
-      const sdfhjksdfhjksdfhjk = await withAnswered(user, response);
+      const withBoolean = await withAnswered(user, withAvatars);
 
-      return res.json(withoutUserField(sdfhjksdfhjksdfhjk));
+      const data = withoutUserField(withBoolean);
+
+      const hasMore =
+        (await this.repo.getCollectionSizeWithoutUser(user._id)) > data.length;
+
+      const response = { data, hasMore };
+
+      return res.json(response);
     } catch (err) {
       console.log(err);
     }

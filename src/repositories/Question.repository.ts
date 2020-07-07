@@ -6,6 +6,7 @@ import {
 } from '../models/Question.model';
 import { mongoose } from '@typegoose/typegoose';
 import { MongooseFilterQuery } from 'mongoose';
+import { ObjectId } from 'mongodb';
 
 type QuestionQuery = Omit<Partial<Question>, 'createdAt'>;
 
@@ -37,13 +38,15 @@ export class QuestionRepository {
     const collectionSize = await mongoose.connection
       .collection('questions')
       .countDocuments();
+
     const magicNumber = Math.floor(Math.random() * collectionSize);
+
     return await this.model
       .find(query)
       .select('+user +answers')
       .sort('date')
-      .limit(limit > 0 ? limit : 1)
-      .skip(magicNumber < collectionSize ? magicNumber : limit);
+      .limit(limit)
+      .skip(limit > collectionSize ? magicNumber : 0);
   }
 
   public async findWithAnswers(query: MongooseFilterQuery<QuestionQuery>) {
@@ -98,5 +101,20 @@ export class QuestionRepository {
   public async getQuestionCount(id: string) {
     const count = await this.model.find({ user: id }).select('+user');
     return count.length;
+  }
+
+  public async getCollectionSize() {
+    const collectionSize = await mongoose.connection
+      .collection('questions')
+      .countDocuments();
+    return collectionSize;
+  }
+
+  public async getCollectionSizeWithoutUser(userId: ObjectId) {
+    const collectionSize = await mongoose.connection
+      .collection('questions')
+      .find({ user: { $not: { $eq: userId } } })
+      .count();
+    return collectionSize;
   }
 }
