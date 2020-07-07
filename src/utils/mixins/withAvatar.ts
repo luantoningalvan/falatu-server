@@ -27,7 +27,8 @@ export async function withAvatar(input: DocumentType<Question>) {
       if (user.avatarList.length === 0) return this.document;
 
       return {
-        ...this.document.toObject(),
+        ...this.document.toJSON(),
+        didAnswer: this.document.didAnswer,
         randomUserAvatar: user.avatarList[randomNumber],
       } as DocumentType<Question>;
     }

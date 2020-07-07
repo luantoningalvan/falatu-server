@@ -26,7 +26,12 @@ import { QuestionTypes } from '../models/Question.model';
 import { User } from '../models/User.model';
 import { uploadMultiple } from '../config/S3';
 import { StorageProvider } from '../providers/Storage.provider';
-import { withAvatarMany, withoutUser, withoutUserField } from '../utils/mixins';
+import {
+  withAvatarMany,
+  withoutUser,
+  withoutUserField,
+  withAnswered,
+} from '../utils/mixins';
 import { UploadError, ShapeError, DatabaseError } from '../utils/errors';
 
 class QuestionInput {
@@ -83,7 +88,9 @@ export class QuestionController {
 
       const response = await withAvatarMany(withoutUser(docs, user));
 
-      return res.json(withoutUserField(response));
+      const sdfhjksdfhjksdfhjk = await withAnswered(user, response);
+
+      return res.json(withoutUserField(sdfhjksdfhjksdfhjk));
     } catch (err) {
       console.log(err);
     }

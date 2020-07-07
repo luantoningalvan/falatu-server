@@ -1,6 +1,7 @@
 import { getModelForClass, prop as Property, Ref } from '@typegoose/typegoose';
 import { User } from './User.model';
 import { TypeSafeTimestamps } from '../utils/misc/TypeSafeTimestamps';
+import { ObjectId } from 'mongodb';
 
 export enum QuestionTypes {
   YESORNOT = 'yesornot',
@@ -63,7 +64,22 @@ export class Question extends TypeSafeTimestamps {
   @Property({ type: Date, default: Date.now() })
   createdAt: Date;
 
-  randomUserAvatar?: string;
+  randomUserAvatar?: any;
+
+  answered?: boolean;
+
+  // Methods
+
+  /**
+   * Check whether an user has alrady answered a question.
+   * @param user The user ID
+   */
+  public didAnswer(user: ObjectId) {
+    return this.answers.some(
+      (answer) =>
+        (answer.answeredBy as ObjectId).toHexString() === user.toHexString()
+    );
+  }
 }
 
 export const QuestionModel = getModelForClass(Question);

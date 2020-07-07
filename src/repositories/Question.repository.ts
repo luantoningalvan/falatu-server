@@ -40,7 +40,7 @@ export class QuestionRepository {
     const magicNumber = Math.floor(Math.random() * collectionSize);
     return await this.model
       .find(query)
-      .select('+user')
+      .select('+user +answers')
       .sort('date')
       .limit(limit > 0 ? limit : 1)
       .skip(magicNumber < collectionSize ? magicNumber : limit);
