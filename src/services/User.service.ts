@@ -37,10 +37,16 @@ export class UserService {
     const notification = new UserRegistered(user.name);
 
     // Send greeting mail
-    await this.mail.send<UserRegistered>(notification, {
-      email: user.email,
-      name: user.name,
-    });
+    await this.mail.send<UserRegistered>(
+      notification,
+      {
+        email: user.email,
+        name: user.name,
+      },
+      {
+        name: user.name,
+      }
+    );
 
     // Return created user
     return user;
@@ -98,6 +104,7 @@ export class UserService {
         name: user.name,
       },
       {
+        name: user.name,
         token: notification.action,
       }
     );

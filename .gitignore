@@ -102,3 +102,6 @@ public
 
 # VS Code settings
 .vscode/
+
+# MJML uncompiled stuff
+src/resources/emails/**/*.mjml

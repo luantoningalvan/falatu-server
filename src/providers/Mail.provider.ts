@@ -1,7 +1,8 @@
 import { Service } from 'typedi';
+import { resolve } from 'path';
+import hbs from 'nodemailer-express-handlebars';
 import { transport } from '../config/Mailer';
 import { Notification } from '../notifications/Notification';
-import Email from 'email-templates';
 
 interface Recipient {
   email: string;
@@ -14,6 +15,19 @@ export class MailProvider {
 
   constructor() {
     this.mailer = transport;
+    this.mailer.use(
+      'compile',
+      hbs({
+        viewEngine: {
+          defaultLayout: false,
+          extname: '.hbs',
+          layoutsDir: resolve(__dirname, '..', 'resources', 'emails'),
+          partialsDir: resolve(__dirname, '..', 'resources', 'emails'),
+        },
+        extName: '.hbs',
+        viewPath: resolve(__dirname, '..', 'resources', 'emails'),
+      })
+    );
   }
 
   public async send<T extends Notification>(
@@ -21,24 +35,12 @@ export class MailProvider {
     recipient: Recipient,
     locals?: { [k: string]: any }
   ) {
-    const msg = new Email({
-      message: {
-        from: 'oi@falatu.fyi',
-      },
-      send: true,
-      transport: this.mailer,
-    });
-
-    await msg.send({
-      template: notification.templatePath,
-      message: {
-        to: recipient.email,
-      },
-      locals: {
-        name: recipient.name,
-        email: recipient.email,
-        ...locals,
-      },
+    await (this.mailer as any).sendMail({
+      from: 'oi@falatu.fyi',
+      to: `${recipient.name} <${recipient.email}>`,
+      subject: notification.subject,
+      template: notification.templateName,
+      context: locals,
     });
   }
 }
