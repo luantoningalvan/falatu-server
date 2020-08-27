@@ -8,4 +8,9 @@ function typescript() {
   return gulp.src('src/**/*.ts').pipe(tsProject()).js.pipe(gulp.dest('build'));
 }
 
-exports.default = gulp.series(typescript, copyTemplates, styles);
+function copyMailTemplates(cb) {
+  gulp.src('./resources/**/**.hbs').pipe(gulp.dest('build/resources'));
+  cb();
+}
+
+exports.default = gulp.series(typescript, copyMailTemplates);
