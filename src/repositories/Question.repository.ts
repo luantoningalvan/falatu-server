@@ -1,9 +1,5 @@
 import { Service } from 'typedi';
-import {
-  Question,
-  QuestionModel,
-  AnswerObject,
-} from '../models/Question.model';
+import { Question, QuestionModel } from '../models/Question.model';
 import { mongoose } from '@typegoose/typegoose';
 import { MongooseFilterQuery } from 'mongoose';
 import { ObjectId } from 'mongodb';
@@ -27,11 +23,11 @@ export class QuestionRepository {
   }
 
   public async findAll() {
-    return await this.model.find({});
+    return await this.model.find({}).select('-answers');
   }
 
   public async findOne(query: QuestionQuery) {
-    return await this.model.findOne(query);
+    return await this.model.findOne(query).select('-answers');
   }
 
   public async findManyAtRandom(query: QuestionQuery, limit: number) {
@@ -58,11 +54,11 @@ export class QuestionRepository {
   }
 
   public async findMany(query: MongooseFilterQuery<QuestionQuery>) {
-    return await this.model.find(query);
+    return await this.model.find(query).select('-answers');
   }
 
   public async findById(id: string) {
-    return await this.model.findById(id);
+    return await this.model.findById(id).select('-answers');
   }
 
   public async delete(id: string) {
@@ -77,8 +73,7 @@ export class QuestionRepository {
    */
   public async getRecentAnsweredQuestions(id: string) {
     const questions = await this.model
-      .find({ user: id })
-      .select('answers')
+      .find({ answers: { $elemMatch: { answeredBy: id } } })
       .sort({ updatedAt: -1 })
       .limit(5);
 
@@ -87,15 +82,23 @@ export class QuestionRepository {
 
   public async getRecentAnswers(id: string) {
     const questions = await this.getRecentAnsweredQuestions(id);
-    const arr: AnswerObject[] = [];
 
+    const answers = [];
+
+    questions.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+    // Iterate over questions array
     questions.forEach((question) => {
-      arr.push(...question.answers);
+      question.answers.forEach((answer) => {
+        answers.push({
+          question: question._id,
+          answer: answer.answer,
+          index: answer.index ?? 0,
+        });
+      });
     });
 
-    arr.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-
-    return arr.slice(0, arr.length >= 5 ? 4 : arr.length);
+    return answers.slice(0, answers.length >= 5 ? 4 : answers.length);
   }
 
   public async getQuestionCount(id: string) {

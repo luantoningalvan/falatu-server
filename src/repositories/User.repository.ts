@@ -18,6 +18,7 @@ export class UserRepository {
     if (!check) {
       return await this.model.create(data);
     }
+    return check;
   }
 
   public async findAll() {

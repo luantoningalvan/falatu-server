@@ -89,7 +89,7 @@ import { CurrentUserChecker } from './auth/CurrentUserChecker';
     console.log(
       [
         `FalaTu API rodando na porta ${PORT}`,
-        'Versão 1.0.0 por Vini Franco e Luan Tonin Galvan',
+        'Versão 1.1.0 por Vini Franco e Luan Tonin Galvan',
       ].join('\n')
     );
   });

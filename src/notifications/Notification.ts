@@ -1,18 +1,18 @@
 export abstract class Notification {
   public subject: string;
-  public templatePath: string;
+  public templateName: string;
   public greeting: string;
   public action?: string;
 
   constructor(
     subject: string,
     greeting: string,
-    templatePath: string,
+    templateName: string,
     action?: string
   ) {
     this.subject = subject;
     this.greeting = greeting;
-    this.templatePath = templatePath;
+    this.templateName = templateName;
     this.action = action || '';
   }
 
