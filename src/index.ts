@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { useExpressServer } from 'routing-controllers';
 import express from 'express';
+import morgan from 'morgan';
 
 // Middlewares
 import helmet from 'helmet';
@@ -48,6 +49,9 @@ import { CurrentUserChecker } from './auth/CurrentUserChecker';
   if (IS_PROD) {
     app.set('trust proxy', 1);
   }
+
+  // Log
+  app.use(morgan('tiny'));
 
   // Security middleware
   app.use(helmet());
