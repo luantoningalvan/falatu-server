@@ -9,7 +9,7 @@ function typescript() {
 }
 
 function copyMailTemplates(cb) {
-  gulp.src('./resources/**/**.hbs').pipe(gulp.dest('build/resources'));
+  gulp.src('./src/resources/**/*.hbs').pipe(gulp.dest('build/resources'));
   cb();
 }
 
