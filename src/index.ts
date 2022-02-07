@@ -3,6 +3,10 @@ import { useExpressServer } from 'routing-controllers';
 import express from 'express';
 import morgan from 'morgan';
 
+// Docs
+import swaggerUi from 'swagger-ui-express';
+import swaggerFile from './swagger.json';
+
 // Middlewares
 import helmet from 'helmet';
 import compression from 'compression';
@@ -70,6 +74,8 @@ import { CurrentUserChecker } from './auth/CurrentUserChecker';
 
   // Compression middleware for reducing response content size
   app.use(compression());
+
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
   useExpressServer(app, {
     authorizationChecker: AuthChecker,
